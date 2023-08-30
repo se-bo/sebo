@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  body {
+    background-color: #D1C5B6;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    font-family: sans-serif;
+  }
+
+  p {
+    font-size: 24px;
+  }
+
+  h2 {
+    color: black;
+  }
+
+  table {
+    color: black;
+  }
+
+  .container {
+    padding: 20px;
+    display: inline-block;
+    text-align: center;
+  }
+
+  .button-group {
+    margin-bottom: 10px;
+  }
+
+  .payment-type-button button {
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-right: 10px;
+    font-size: 32px;
+    box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.2), -4px -4px 8px rgba(93, 93, 93, 0.1);
+  }
+
+  .cash-button {
+    background-color: #71907E;
+    color: floralwhite;
+    font-weight: bold;
+  }
+
+  .card-button {
+    background-color: #485D71;
+    color: floralwhite;
+    font-weight: bold;
+  }
+
+  .product-button button {
+    background-color: #CB846D;
+    color: floralwhite;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 3px;
+    cursor: pointer;
+    margin-right: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.2), -4px -4px 8px rgba(93, 93, 93, 0.1);
+  }
+
+    .confirm-button button {
+    background-color: #7A4851;
+    color: floralwhite;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    margin-right: 10px;
+    font-size: 24px;
+    font-weight: bold;
+    box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.2), -4px -4px 8px rgba(93, 93, 93, 0.1);
+  }
+
+  input {
+    width: 100%;
+  }
+
+  .log {
+    color: floralwhite;
+  }
+  
+  .log-heading {
+    text-align: center;
+  }
+  
+  .log-table {
+    width: 100%;
+    text-align: left;
+    margin-top: 20px;
+  }
+  
+  .log-table th, .log-table td {
+    padding: 8px;
+    border-bottom: 1px solid #ccc;
+  }
+</style>
+  <title>Split Divs Example</title>
+</head>
+<body>
+  <div class="container">
+      <p align="left">
+        <b>Market name:</b><br>
+        <input id="marketName"></input>
+      </p>
+    <div class="payment-type-button">
+      <button class="cash-button" onclick="selectPaymentType('Cash')">Cash</button>
+      <button class="card-button" onclick="selectPaymentType('Card')">Card</button>
+    </div>
+    <br>
+    <div class="product-button">
+      <button onclick="toggleProduct('4oz', 25)">4oz</button>
+      <button onclick="toggleProduct('7oz', 55)">7oz</button>
+      <button onclick="toggleProduct('8oz', 38)">8oz</button>
+    </div>
+    <br>
+    <p class="cart-heading">Cart</p>
+    <b><p id="cartItems">No items selected</p></b>
+    <p align="center">
+      Payment type:<br>
+      <p><b id="selectedPaymentType">--</b></p>
+      Amount:<br>
+      <p><b id="selectedAmount">$0.00</b></p>
+      <p align="left">
+        <b>Notes:</b><br>
+        <input id="saleNotes"></input>
+      </p>
+      <br>
+    </p>
+    <div class="confirm-button">
+      <button onclick="updateLog()">Confirm</button>
+    </div>
+  </div>
+
+  <div class="cart">
+  </div>
+
+  <div class="log">
+    <h2 class="log-heading">Sales history</h2>
+    <table class="log-table">
+      <thead>
+        <tr>
+          <th>Payment Type</th>
+          <th>Products</th>
+          <th>Sale Amount</th>
+          <th>Sale Time</th>
+          <th>Market Name</th>
+          <th>Sale Notes</th>
+        </tr>
+      </thead>
+      <tbody id="logList"></tbody>
+    </table>
+  </div>
+
+<script>
+  let selectedPaymentType = '--'; // Default value
+  let selectedProducts = []; // Array to store selected products and their quantities
+  let totalAmount = 0;
+
+  function selectPaymentType(paymentType) {
+    selectedPaymentType = paymentType;
+    document.getElementById('selectedPaymentType').textContent = paymentType;
+  }
+
+  function toggleProduct(product, amount) {
+    const index = selectedProducts.findIndex(item => item.product === product);
+
+    if (index !== -1) {
+      selectedProducts[index].quantity++;
+      totalAmount += amount;
+    } else {
+      selectedProducts.push({ product, quantity: 1 });
+      totalAmount += amount;
+    }
+
+    document.getElementById('selectedAmount').textContent = `$${totalAmount.toFixed(2)}`;
+    updateCart();
+  }
+
+  function updateCart() {
+    const cartItemsElement = document.getElementById('cartItems');
+    const cartTotalElement = document.getElementById('cartTotal');
+    cartItemsElement.textContent = selectedProducts.length > 0 ? formatCartItems() : 'No items selected';
+    cartTotalElement.textContent = `$${totalAmount.toFixed(2)}`;
+  }
+
+  function formatCartItems() {
+    return selectedProducts.map(item => `${item.product} (${item.quantity}x)`).join(', ');
+  }
+
+  function updateLog() {
+
+    if (selectedProducts.length > 0) {
+      const logList = document.getElementById('logList');
+      const newRow = logList.insertRow();
+
+      const paymentCell = newRow.insertCell(0);
+      paymentCell.textContent = selectedPaymentType;
+
+      const productCell = newRow.insertCell(1);
+      productCell.textContent = formatCartItems();
+
+      const totalCell = newRow.insertCell(2);
+      totalCell.textContent = `$${totalAmount.toFixed(2)}`;
+
+      const timestampCell = newRow.insertCell(3);
+      const pstTime = new Date().toLocaleString('en-US', { timeZone: 'America/Los_Angeles' });
+      timestampCell.textContent = pstTime;
+
+      const saleNotesCell = newRow.insertCell(4);
+      const saleNotesValue = document.querySelector('#saleNotes').value;
+      saleNotesCell.textContent = saleNotesValue;
+
+      const marketNameCell = newRow.insertCell(4);
+      const marketNameValue = document.querySelector('#marketName').value;
+      marketNameCell.textContent = marketNameValue;
+
+      selectedProducts = [];
+      totalAmount = 0;
+      document.getElementById('selectedAmount').textContent = '$0.00';
+
+      selectedPaymentType = '--'; // Reset payment type
+      document.getElementById('selectedPaymentType').textContent = selectedPaymentType;
+
+      // saleNotes = "";// Reset sale notes
+      // document.getElementById('saleNotes').textContent = "";
+
+      updateCart();
+    }
+  }
+</script>
+</body>
+</html>
